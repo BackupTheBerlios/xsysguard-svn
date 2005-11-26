@@ -144,7 +144,14 @@ static double get_as_double(type_t var_type, unsigned int var_id, void *val) {
 /******************************************************************************/
 
 static void render_line_widget(Imlib_Image buffer, widget_t *widget, int up_x, int up_y) {
-	// TODO
+	line_widget_t *widget_data;
+
+	widget_data = (line_widget_t *) widget->data;
+	imlib_context_set_image(buffer);
+	imlib_context_set_color(widget_data->color.r, widget_data->color.g,
+			widget_data->color.b, widget_data->color.a);
+	imlib_image_draw_line(widget->x - up_x, widget->y - up_y,
+			widget->x - up_x + widget->width, widget->y - up_y + widget->height, 0);
 }
 
 static void render_rectangle_widget(Imlib_Image buffer, widget_t *widget, int up_x, int up_y) {
@@ -781,6 +788,7 @@ void default_widgets() {
 	};
 
 	parse_rectangle_widget("0 0 120 100 #000000FF", NULL, 0, NULL);
+//	parse_line_widget("10 10 60 20 #00FFFFFF", NULL, 0, NULL);
 //	parse_image_widget("0 0 100 100 1.png", NULL, 0, NULL);
 	parse_linechart_widget("1 0 0 120 100 N + 0.0 100.0", &(var_list[1]), 2, varlines);
 //	parse_linechart_widget("2 0 0 120 100 N 0.0", &(var_list[1]), 2, varlines);
