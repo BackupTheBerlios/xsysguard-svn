@@ -19,6 +19,7 @@
  */
 
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -38,6 +39,32 @@ static widget_t *widget_list = NULL;
 static unsigned int widget_list_len = 0;
 
 /******************************************************************************/
+
+static void expand_filename(char **name) {
+	char *home;
+	char *new;
+
+	home = getenv("HOME");
+	if (!home)
+		return;
+
+	if (*name[0] == '~') {
+		new = (char *) smalloc(strlen(*name) + strlen(home) + 1 - 1);
+		strcpy(new, home);
+		strcat(new, *name + 1);
+		//free(*name);
+		*name = new;
+		printf("%s\n", *name);
+	}
+	if (*name[0] != '/') {
+		new = (char *) smalloc(strlen(*name) + strlen(home) + 1 + 12);
+		strcpy(new, home);
+		strcat(new, "/.xsysguard/");
+		strcat(new, *name);
+		//free(*name);
+		*name = new;
+	}
+}
 
 static orientation_t parse_orientation(char orientation_char) {
 	switch (orientation_char) {
@@ -530,6 +557,7 @@ static void parse_image_widget(char *line, var_t *var, unsigned int var_count, c
 	widget_data = (image_widget_t *) widget->data;
 	widget_data->filename = (char *) smalloc(strlen(filename) + 1);
 	strcpy(widget_data->filename, filename);
+	expand_filename(&widget_data->filename);
 }
 
 static void parse_barchart_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
@@ -675,7 +703,15 @@ static void parse_linechart_widget(char *line, var_t *var, unsigned int var_coun
 	widget_data->static_max = static_max;
 	widget_data->min = min;
 	widget_data->max = max;
-	widget_data->bgfile = filename;
+
+	if (filename) {
+		widget_data->bgfile = (char *) smalloc(strlen(filename) + 1);
+		strcpy(widget_data->bgfile, filename);
+		expand_filename(&widget_data->bgfile);
+	} else {
+		widget_data->bgfile = filename;
+	}
+
 	widget_data->img = imlib_create_image(width, height);
 	widget_data->data_index = 0;
 
@@ -745,6 +781,7 @@ void default_widgets() {
 	};
 
 	parse_rectangle_widget("0 0 120 100 #000000FF", NULL, 0, NULL);
+//	parse_image_widget("0 0 100 100 1.png", NULL, 0, NULL);
 	parse_linechart_widget("1 0 0 120 100 N + 0.0 100.0", &(var_list[1]), 2, varlines);
 //	parse_linechart_widget("2 0 0 120 100 N 0.0", &(var_list[1]), 2, varlines);
 }
