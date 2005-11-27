@@ -265,7 +265,16 @@ void render_widgets_on_drawable() {
 /******************************************************************************/
 
 static void update_barchart_widget_value(widget_t *widget) {
-	// TODO
+	barchart_widget_t *widget_data;
+	var_t *var;
+	unsigned int i;
+
+	widget_data = (barchart_widget_t *) widget->data;
+
+	for (i=0; i < widget->var_count; i++) {
+		var = &(widget->var[i]);
+		widget_data->data[i] = get_as_double(var->type, var->id, (*(var->func))(var));
+	}
 }
 
 static void update_linechart_widget_value(widget_t *widget) {
