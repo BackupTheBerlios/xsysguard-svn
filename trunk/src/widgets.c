@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <float.h>
 #include <math.h>
 #include "common.h"
 #include "util.h"
@@ -284,7 +285,9 @@ static void update_linechart_widget_value(widget_t *widget) {
 	color_t color;
 	ImlibPolygon poly[widget->var_count];
 	unsigned int i, j, index;
-	double *data, min, max;
+	double *data;
+	double min = DBL_MAX;
+	double max = DBL_MIN;
 	int xval, yval;
 	int widget_val_count;
 
@@ -311,11 +314,19 @@ static void update_linechart_widget_value(widget_t *widget) {
 	}
 
 	if (!widget_data->static_min || !widget_data->static_max) {
-		for (i=0; i < widget->var_count; i++) {
-			data = widget_data->data[i];
-			for (j=0; j < widget_val_count; j++) {
-				min = min(data[j], min);
-				max = max(data[j], max);
+		for (j=0; j < widget_val_count; j++) {
+			double sum = 0.0;
+			for (i=0; i < widget->var_count; i++) {
+				data = widget_data->data[i];
+				if (!isnan(data[j])) {
+					sum += data[j];
+					min = min(data[j], min);
+					max = max(data[j], max);
+				}
+			}
+			if (widget_data->add) {
+				min = min(sum, min);
+				max = max(sum, max);
 			}
 		}
 	}
@@ -598,12 +609,11 @@ static void parse_barchart_widget(char *line, var_t *var, unsigned int var_count
 	if (n < 6)
 		dief("cannot parse configuration line: barchart %s", line);
 
-	n = sscanf(line + m, "+ %lf %lf", &min, &max);
-
-	if (n > 0)
+	if ((n = string_starts_with(line + m, "+")))
 		add = true;
-	else
-		n = sscanf(line + m, "%lf %lf", &min, &max);
+	m += n;
+
+	n = sscanf(line + m, "%lf %lf", &min, &max);
 
 	if (n >= 1)
 		static_min = true;
@@ -675,12 +685,11 @@ static void parse_linechart_widget(char *line, var_t *var, unsigned int var_coun
 	if (n < 6)
 		dief("cannot parse configuration line: linechart %s", line);
 
-	n = sscanf(line + m, "+ %lf %n %lf %n", &min, &o, &max, &p);
-
-	if (n > 0)
+	if ((n = string_starts_with(line + m, "+")))
 		add = true;
-	else
-		n = sscanf(line + m, "%lf %n %lf %n", &min, &o, &max, &p);
+	m += n;
+
+	n = sscanf(line + m, "%lf %n %lf %n", &min, &o, &max, &p);
 
 	if (n >= 1)
 		static_min = true;
@@ -791,7 +800,7 @@ void default_widgets() {
 //	set_stat_var(&(var_list[1]), 1, 1, "network_io_stats_diff", "tx", "eth0");
 //	set_stat_var(&(var_list[2]), 1, 2, "network_io_stats_diff", "rx", "eth0");
 
-	static char* varlines[] = {
+	static char *varlines[] = {
 		"#FF0000FF",
 		"#00FF00FF"
 	};
