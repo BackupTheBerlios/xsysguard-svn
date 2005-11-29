@@ -189,8 +189,8 @@ static void render_image_widget(Imlib_Image buffer, widget_t *widget, int up_x, 
 static void render_barchart_widget(Imlib_Image buffer, widget_t *widget, int up_x, int up_y) {
 	barchart_widget_t *widget_data;
 	Imlib_Color_Range range;
-	double min = DBL_MAX;
-	double max = DBL_MIN;
+	double min = 0.0;
+	double max = 0.0;
 	double sum = 0.0;
 	unsigned int i;
 	int clip_x, clip_y, clip_w, clip_h;
@@ -207,12 +207,10 @@ static void render_barchart_widget(Imlib_Image buffer, widget_t *widget, int up_
 		for (i=0; i < widget->var_count; i++) {
 			if (!isnan(widget_data->data[i])) {
 				sum += widget_data->data[i];
-				min = min(widget_data->data[i], min);
 				max = max(widget_data->data[i], max);
 			}
 		}
 		if (widget_data->add) {
-			min = min(sum, min);
 			max = max(sum, max);
 		}
 		sum = 0.0;
@@ -393,8 +391,8 @@ static void update_linechart_widget_value(widget_t *widget) {
 	ImlibPolygon poly[widget->var_count];
 	unsigned int i, j, index;
 	double *data;
-	double min = DBL_MAX;
-	double max = DBL_MIN;
+	double min = 0.0;
+	double max = 0.0;
 	int xval, yval;
 	int widget_val_count;
 
@@ -427,12 +425,10 @@ static void update_linechart_widget_value(widget_t *widget) {
 				data = widget_data->data[i];
 				if (!isnan(data[j])) {
 					sum += data[j];
-					min = min(data[j], min);
 					max = max(data[j], max);
 				}
 			}
 			if (widget_data->add) {
-				min = min(sum, min);
 				max = max(sum, max);
 			}
 		}
