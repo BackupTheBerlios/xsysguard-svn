@@ -31,6 +31,7 @@
 #include "widgets.h"
 
 #define NaN sqrt(-1); // FIXME
+#define round(x) ((x)>=0?(int) ((x)+0.5) : (int)((x)-0.5))
 #define max(a, b) ((a) > (b)) ? (a) : (b)
 #define min(a, b) ((a) > (b)) ? (b) : (a)
 
@@ -186,7 +187,112 @@ static void render_image_widget(Imlib_Image buffer, widget_t *widget, int up_x, 
 }
 
 static void render_barchart_widget(Imlib_Image buffer, widget_t *widget, int up_x, int up_y) {
-	// TODO
+	barchart_widget_t *widget_data;
+	Imlib_Color_Range range;
+	double min = DBL_MAX;
+	double max = DBL_MIN;
+	double sum = 0.0;
+	unsigned int i;
+	int clip_x, clip_y, clip_w, clip_h;
+	color_t color_min, color_max;
+	double angle;
+	double data;
+	int last = 0;
+
+	widget_data = (barchart_widget_t *) widget->data;
+
+	imlib_context_set_image(buffer);
+
+	if (!widget_data->static_min || !widget_data->static_max) {
+		for (i=0; i < widget->var_count; i++) {
+			if (!isnan(widget_data->data[i])) {
+				sum += widget_data->data[i];
+				min = min(widget_data->data[i], min);
+				max = max(widget_data->data[i], max);
+			}
+		}
+		if (widget_data->add) {
+			min = min(sum, min);
+			max = max(sum, max);
+		}
+		sum = 0.0;
+	}
+	if (widget_data->static_min)
+		min = widget_data->min;
+	if (widget_data->static_max)
+		max = widget_data->max;
+
+	for (i=0; i < widget->var_count; i++) {
+		if (!isnan(widget_data->data[i])) {
+			color_min = widget_data->color_min[i];
+			color_max = widget_data->color_max[i];
+			range = imlib_create_color_range();
+			imlib_context_set_color_range(range);
+			imlib_context_set_color(color_max.r, color_max.g, color_max.b, color_max.a);
+			imlib_add_color_to_color_range(0);
+			imlib_context_set_color(color_min.r, color_min.g, color_min.b, color_min.a);
+
+			data = widget_data->data[i];
+
+			if (widget_data->orientation == NORTH) {
+				imlib_add_color_to_color_range(widget->height);
+				angle = 0.0;
+				clip_x = widget->x - up_x;
+				clip_w = widget->width;
+				clip_h = round((((data - min) / (max - min)) *
+						(double) (widget->height)));
+				clip_y = widget->y - up_y + widget->height - clip_h;
+				if (widget_data->add)
+					clip_y -= last;
+				last += clip_h;
+			} else if (widget_data->orientation == SOUTH) {
+				imlib_add_color_to_color_range(widget->height);
+				angle = 180.0;
+				clip_x = widget->x - up_x;
+				clip_w = widget->width;
+				clip_h = round((((data - min) / (max - min)) *
+						(double) (widget->height)));
+				clip_y = widget->y - up_y;
+				if (widget_data->add)
+					clip_y += last;
+				last += clip_h;
+			} else if (widget_data->orientation == WEST) {
+				imlib_add_color_to_color_range(widget->width);
+				angle = 90.0;
+				clip_y = widget->y - up_y;
+				clip_h = widget->height;
+				clip_w = round((((data -min) / (max - min)) *
+						(double) (widget->width)));
+				clip_x = widget->x - up_x;
+				if (widget_data->add)
+					clip_x += last;
+				last += clip_w;
+			} else if (widget_data->orientation == EAST) {
+				imlib_add_color_to_color_range(widget->width);
+				angle = 270.0;
+				clip_y = widget->y - up_y;
+				clip_h = widget->height;
+				clip_w = round((((data - min) / (max - min)) *
+						(double) (widget->width)));
+				clip_x = widget->x - up_x + widget->width - clip_w;
+				if (widget_data->add)
+					clip_x -= last;
+				last += clip_w;
+			} else {
+				dief("unknown orientation");
+			}
+			imlib_context_set_cliprect(clip_x, clip_y, clip_w, clip_h);
+			if (clip_w > 0 && clip_h > 0)
+				imlib_image_fill_color_range_rectangle(widget->x - up_x, widget->y - up_y,
+						widget->width, widget->height, angle);
+			imlib_free_color_range();
+
+			if (widget_data->add)
+				sum += data;
+			else
+				sum = data;
+		}
+	}
 }
 
 static void render_linechart_widget(Imlib_Image buffer, widget_t *widget, int up_x, int up_y) {
@@ -252,6 +358,7 @@ void render_widgets_on_drawable() {
 					dief("unknown widget type %hhd", widget->type);
 					break;
 			}
+			imlib_context_set_cliprect(0, 0, 0, 0);
 		}
 		imlib_context_set_image(buffer);
 		imlib_render_image_on_drawable(up_x, up_y);
@@ -804,11 +911,16 @@ void default_widgets() {
 		"#FF0000FF",
 		"#00FF00FF"
 	};
+	static char *varlines2[] = {
+		"#FF000044 #FF0000FF",
+		"#00FF0044 #00FF00FF"
+	};
 
 	parse_rectangle_widget("0 0 120 100 #000000FF", NULL, 0, NULL);
 //	parse_line_widget("10 10 60 20 #00FFFFFF", NULL, 0, NULL);
 //	parse_image_widget("0 0 100 100 1.png", NULL, 0, NULL);
 	parse_linechart_widget("1 0 0 120 100 N + 0.0 100.0", &(var_list[1]), 2, varlines);
+	parse_barchart_widget("1 0 0 4 100 N + 0.0 100.0", &(var_list[1]), 2, varlines2);
 //	parse_linechart_widget("2 0 0 120 100 N 0.0", &(var_list[1]), 2, varlines);
 }
 
