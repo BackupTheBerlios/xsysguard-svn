@@ -128,6 +128,7 @@ typedef struct {
 	color_t *color_min;
 	color_t *color_max;
 	color_t *color_top;
+	unsigned int *top_pixel;
 	double **data;
 } areachart_widget_t;
 

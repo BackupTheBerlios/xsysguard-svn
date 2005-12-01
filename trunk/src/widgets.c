@@ -868,7 +868,122 @@ static void parse_linechart_widget(char *line, var_t *var, unsigned int var_coun
 }
 
 static void parse_areachart_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
-	// TODO
+	areachart_widget_t *widget_data;
+	widget_t *widget;
+	orientation_t orientation;
+	unsigned long long mult;
+	int x, y, width, height;
+	char orientation_char = 'N';
+	boolean add = false;
+	boolean static_min = false;
+	boolean static_max = false;
+	color_t color_min;
+	color_t color_max;
+	color_t color_top;
+	unsigned int top_pixel;
+	double min = NaN;
+	double max = NaN;
+	int n, m, o, p;
+	int i, j;
+	char filenamei[buflen];
+	char *filename = filenamei;
+
+	n = sscanf(line, "%llu %d %d %d %d %c %n", &mult, &x, &y, &width, &height, &orientation_char, &m);
+
+	if (n < 6)
+		dief("cannot parse configuration line: areachart %s", line);
+
+	if ((n = string_starts_with(line + m, "+")))
+		add = true;
+	m += n;
+
+	n = sscanf(line + m, "%lf %n %lf %n", &min, &o, &max, &p);
+
+	if (n >= 1)
+		static_min = true;
+	if (n >= 2)
+		static_max = true;
+
+	if (static_min && !static_max)
+		m += o;
+	if (static_min && static_max)
+		m += p;
+
+	if (!parse_quoted_string(line + m, filename))
+		if ((sscanf(line + m, "%s", filename)) != 1)
+			filename = NULL;
+
+	orientation = parse_orientation(orientation_char);
+
+	widget_list_len++;
+	widget_list = (widget_t *) srealloc((void *) widget_list, sizeof(widget_t) * widget_list_len);
+	widget = &(widget_list[widget_list_len - 1]);
+
+	widget->mult = mult;
+	widget->x = x;
+	widget->y = y;
+	widget->width = width;
+	widget->height = height;
+	widget->type = areachart_widget;
+	widget->var = var;
+	widget->var_count = var_count;
+
+	widget->data = (areachart_widget_t *) smalloc(sizeof(areachart_widget_t));
+	widget_data = (areachart_widget_t *) widget->data;
+	widget_data->orientation = orientation;
+	widget_data->add = add;
+	widget_data->static_min = static_min;
+	widget_data->static_max = static_max;
+	widget_data->min = min;
+	widget_data->max = max;
+
+	if (filename) {
+		widget_data->bgfile = (char *) smalloc(strlen(filename) + 1);
+		strcpy(widget_data->bgfile, filename);
+		expand_filename(&widget_data->bgfile);
+	} else {
+		widget_data->bgfile = filename;
+	}
+
+	widget_data->img = imlib_create_image(width, height);
+	widget_data->data_index = 0;
+
+	imlib_context_set_image(widget_data->img);
+	imlib_image_set_has_alpha(1);
+
+	widget_data->color_min = (color_t *) smalloc(sizeof(color_t) * var_count);
+	widget_data->color_max = (color_t *) smalloc(sizeof(color_t) * var_count);
+	widget_data->color_top = (color_t *) smalloc(sizeof(color_t) * var_count);
+	widget_data->top_pixel = (unsigned int *) smalloc(sizeof(unsigned int) * var_count);
+	widget_data->data = (double **) smalloc(sizeof(double *) * var_count);
+
+	for (i=0; i < var_count; i++) {
+		n = sscanf(varlines[i], "#%2hhx%2hhx%2hhx%2hhx #%2hhx%2hhx%2hhx%2hhx "
+					"#%2hhx%2hhx%2hhx%2hhx %u",
+				&color_min.r, &color_min.g, &color_min.b, &color_min.a,
+				&color_max.r, &color_max.g, &color_max.b, &color_max.a,
+				&color_top.r, &color_top.g, &color_top.b, &color_top.a,
+				&top_pixel);
+		if (n < 4)
+			dief("cannot parse areachart configuration: %s", varlines[i]);
+		if (n < 8)
+			color_max = color_min;
+		if (n < 12)
+			top_pixel = 0;
+		widget_data->color_min[i] = color_min;
+		widget_data->color_max[i] = color_max;
+		widget_data->color_top[i] = color_top;
+		widget_data->top_pixel[i] = top_pixel;
+		if (orientation == WEST || orientation == EAST) {
+			widget_data->data[i] = (double *) smalloc(sizeof(double) * height);
+			for (j=0; j < height; j++)
+				widget_data->data[i][j] = NaN;
+		} else {
+			widget_data->data[i] = (double *) smalloc(sizeof(double) * width);
+			for (j=0; i < width; j++)
+				widget_data->data[i][j] = NaN;
+		}
+	}
 }
 
 static void parse_text_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
