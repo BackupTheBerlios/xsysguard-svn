@@ -140,6 +140,8 @@ int main(int argc, char **argv) {
 
 	// TODO: read configuration into buffer
 
+	init_font_path();
+
 	// TODO: parse configuration
 
 	default_widgets();

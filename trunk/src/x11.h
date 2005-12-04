@@ -34,6 +34,8 @@ extern Imlib_Updates updates;
 /******************************************************************************/
 
 int init_x11();
+void set_font_path(char *path);
+void init_font_path();
 int parse_geometry(char *geometry);
 void handle_xevents();
 

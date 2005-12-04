@@ -1424,16 +1424,16 @@ void default_widgets() {
 		"#00FF0044 #00FF00FF"
 	};
 
-//	static char *varlines3[] = {
-//		"1.0", "1.0"
-//	};
+	static char *varlines3[] = {
+		"1.0", "1.0"
+	};
 
 	parse_rectangle_widget("0 0 120 100 #000000FF", NULL, 0, NULL);
 //	parse_line_widget("10 10 60 20 #00FFFFFF", NULL, 0, NULL);
 //	parse_image_widget("0 0 100 100 1.png", NULL, 0, NULL);
 	parse_linechart_widget("1 0 0 120 100 N + 0.0 100.0", &(var_list[1]), 2, varlines);
 	parse_barchart_widget("1 0 0 4 100 N + 0.0 100.0", &(var_list[1]), 2, varlines2);
-//	parse_text_widget("1 0 0 120 100 N 7 #0000FFFF \"Arial_Bold/10\" \"%.2f\n%.2f\"", &(var_list[1]), 2, varlines3);
+	parse_text_widget("1 0 0 120 100 N 7 #0000FFFF \"Arial/8\" \"%.2f\n%.2f\"", &(var_list[1]), 2, varlines3);
 //	parse_linechart_widget("2 0 0 120 100 N 0.0", &(var_list[1]), 2, varlines);
 }
 

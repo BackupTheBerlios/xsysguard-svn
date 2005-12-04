@@ -23,6 +23,7 @@
 #include <X11/Xutil.h>
 #include <Imlib2.h>
 #include <string.h>
+#include <stdlib.h>
 #include "common.h"
 #include "util.h"
 #include "x11.h"
@@ -58,6 +59,34 @@ int init_x11() {
 	updates = imlib_updates_init();
 
 	return ConnectionNumber(display);
+}
+
+void set_font_path(char *path) {
+	imlib_add_path_to_font_path(path);
+}
+
+void init_font_path() {
+	char buf[buflen];
+	char *home;
+
+	home = getenv("HOME");
+
+	if (home) {
+		strcpy(buf, home);
+		strcat(buf, "/.xsysguard/fonts");
+		imlib_add_path_to_font_path(buf);
+		strcpy(buf, home);
+		strcat(buf, "/.xsysguard");
+		imlib_add_path_to_font_path(buf);
+		strcpy(buf, home);
+		strcat(buf, "/.fonts");
+		imlib_add_path_to_font_path(buf);
+	}
+
+	imlib_add_path_to_font_path("/usr/share/fonts/truetype");
+	imlib_add_path_to_font_path("/usr/X/lib/X11/fonts/TrueType");
+	imlib_add_path_to_font_path("/usr/X11R6/lib/X11/fonts/truetype");
+	imlib_add_path_to_font_path("/usr/X11R6/lib/X11/fonts/TrueType");
 }
 
 int parse_geometry(char *geometry) {
