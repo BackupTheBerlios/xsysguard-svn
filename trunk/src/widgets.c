@@ -310,8 +310,156 @@ static void render_areachart_widget(Imlib_Image buffer, widget_t *widget, int up
 	imlib_blend_image_onto_image(widget_data->img, 1, 0, 0, widget->width, widget->height,
 			widget->x - up_x, widget->y - up_y, widget->width, widget->height);
 }
+
 static void render_text_widget(Imlib_Image buffer, widget_t *widget, int up_x, int up_y) {
-	// TODO
+	text_widget_t *widget_data;
+	char buf[buflen];
+	int n = 0, string_len, line_count = 1;
+	int line_height, line_width, x, y;
+	unsigned int i;
+	char *c;
+
+	widget_data = (text_widget_t *) widget->data;
+	imlib_context_set_image(buffer);
+	imlib_context_set_font(widget_data->font);
+	imlib_context_set_color(widget_data->color.r, widget_data->color.g,
+			widget_data->color.b, widget_data->color.a);
+
+	string_len = strlen(widget_data->string);
+
+	c = widget_data->string;
+	while (*c)
+		if (*c++ == '\n')
+			line_count++;
+
+	switch (widget_data->orientation) {
+		case NORTH:
+			imlib_context_set_direction(IMLIB_TEXT_TO_RIGHT);
+			break;
+		case SOUTH:
+			imlib_context_set_direction(IMLIB_TEXT_TO_LEFT);
+			break;
+		case WEST:
+			imlib_context_set_direction(IMLIB_TEXT_TO_UP);
+			break;
+		case EAST:
+			imlib_context_set_direction(IMLIB_TEXT_TO_DOWN);
+			break;
+		default:
+			dief("unknown orientation %hhd", widget_data->orientation);
+			break;
+	}
+
+	c = widget_data->string;
+	if (widget_data->orientation == NORTH || widget_data->orientation == SOUTH) {
+		for (i=0; i < line_count; i++) {
+			sscanf(c, "%[^\n]\n%n", buf, &n);
+			c += n;
+			imlib_get_text_advance(buf, &line_width, &line_height);
+			switch (widget_data->alignment) {
+				case 1:
+					x = 0;
+					y = widget->height - ((line_count - i) * line_height);
+					break;
+				case 2:
+					x = (widget->width - line_width) / 2;
+					y = widget->height - ((line_count - i) * line_height);
+					break;
+				case 3:
+					x = widget->width - line_width;
+					y = widget->height - ((line_count - i) * line_height);
+					break;
+				case 4:
+					x = 0;
+					y = ((widget->height - (line_count * line_height)) / 2)
+						+ i * line_height;
+					break;
+				case 5:
+					x = (widget->width - line_width) / 2;
+					y = ((widget->height - (line_count * line_height)) / 2)
+						+ i * line_height;
+					break;
+				case 6:
+					x = widget->width - line_width;
+					y = ((widget->height - (line_count * line_height)) / 2)
+						+ i * line_height;
+					break;
+				case 7:
+					x = 0;
+					y = i * line_height;
+					break;
+				case 8:
+					x = (widget->width - line_width) / 2;
+					y = i * line_height;
+					break;
+				case 9:
+					x = widget->width - line_width;
+					y = i * line_height;
+					break;
+				default:
+					dief("unknown alignment %hhd", widget_data->alignment);
+					break;
+			}
+			imlib_context_set_cliprect(- up_x, - up_y,
+					widget->width, widget->height); // FIXME
+			imlib_text_draw(widget->x - up_x + x, widget->y - up_y + y, buf);
+		}
+	} else if (widget_data->orientation == WEST || widget_data->orientation == EAST) {
+		for (i=0; i < line_count; i++) {
+			sscanf(c, "%[^\n]\n%n", buf, &n);
+			c += n;
+			imlib_get_text_advance(buf, &line_width, &line_height);
+			switch (widget_data->alignment) {
+				case 1:
+					x = i * line_height;;
+					y = widget->height - line_width;
+					break;
+				case 2:
+					x = ((widget->width - (line_count * line_height)) / 2)
+						+ i * line_height;
+					y = widget->height - line_width;
+					break;
+				case 3:
+					x = widget->width - ((line_count - i) * line_height);
+					y = widget->height - line_width;
+					break;
+				case 4:
+					x = i * line_height;
+					y = (widget->height - line_width) / 2;
+					break;
+				case 5:
+					x = ((widget->width - (line_count * line_height)) / 2)
+						+ i * line_height;
+					y = (widget->height - line_width) / 2;
+					break;
+				case 6:
+					x = widget->width - ((line_count - i) * line_height);
+					y = (widget->height - line_width) / 2;
+					break;
+				case 7:
+					x = i * line_height;
+					y = 0;
+					break;
+				case 8:
+					x = ((widget->width - (line_count * line_height)) / 2)
+						+ i * line_height;
+					y = 0;
+					break;
+				case 9:
+					x = widget->width - ((line_count - i) * line_height);
+					y = 0;
+					break;
+				default:
+					dief("unknown alignment %hhd", widget_data->alignment);
+					break;
+			}
+			imlib_context_set_cliprect(- up_x, - up_y,
+					widget->width, widget->height); // FIXME
+			imlib_text_draw(widget->x - up_x + x, widget->y - up_y + y, buf);
+		}
+	} else {
+		dief("unknown orientation %hhd", widget_data->orientation);
+	}
 }
 
 void render_widgets_on_drawable() {
@@ -493,7 +641,149 @@ static void update_areachart_widget_value(widget_t *widget) {
 }
 
 static void update_text_widget_value(widget_t *widget) {
-	// TODO
+	text_widget_t *widget_data;
+	var_t *var;
+	char bufi[buflen];
+	char *str, *fmt, *buf = bufi;
+	unsigned int i, len;
+
+	widget_data = (text_widget_t *) widget->data;
+	str = widget_data->string;
+	fmt = widget_data->format;
+
+	// copy until first '%'
+	while (*fmt) {
+		if (*fmt == '%') {
+			if (fmt[1] == '%')
+				*buf++ = *fmt++;
+			else
+				break;
+		}
+		*buf++ = *fmt++;
+	}
+	// no '%' found
+	if (!*fmt) {
+		strcpy(widget_data->string, bufi);
+		return;
+	}
+	// copy first '%'
+	*buf++ = *fmt++;
+	// copy until second '%'
+	while (*fmt) {
+		if (*fmt == '%') {
+			if (fmt[1] == '%')
+				*buf++ = *fmt++;
+			else
+				break;
+		}
+		*buf++ = *fmt++;
+	}
+	*buf = '\0';
+
+	for (i=0; i < widget->var_count; i++) {
+		if (!*bufi)
+			return;
+		var = &(widget->var[i]);
+		len = buflen - (str - widget_data->string);
+		switch (var->type) {
+			case string_type: {
+				str += snprintf(str, len, bufi, (*(var->func))(var));
+				break; }
+			case char_type: {
+				char val;
+				val = *(char *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case uchar_type: {
+				unsigned char val;
+				val = *(unsigned char *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case short_type: {
+				short val;
+				val = *(short *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case ushort_type: {
+				unsigned short val;
+				val = *(unsigned short *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case int_type: {
+				int val;
+				val = *(int *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case uint_type: {
+				unsigned int val;
+				val = *(unsigned int *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case long_type: {
+				long val;
+				val = *(long *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case ulong_type: {
+				unsigned long val;
+				val = *(unsigned long *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case longlong_type: {
+				long long val;
+				val = *(long long *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case ulonglong_type: {
+				unsigned long long val;
+				val = *(unsigned long long *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case float_type: {
+				float val;
+				val = *(float *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case double_type: {
+				double val;
+				val = *(double *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			case longdouble_type: {
+				long double val;
+				val = *(long double *) (*(var->func))(var);
+				val *= widget_data->factor[i];
+				str += snprintf(str, len, bufi, val);
+				break; }
+			default:
+				dief("Variable %u has unknown type %d", var->id, var->type);
+				break;
+		}
+		buf = bufi;
+		*buf++ = *fmt++;
+		while (*fmt) {
+			if (*fmt == '%') {
+				if (fmt[1] == '%')
+					*buf++ = *fmt++;
+				else
+					break;
+			}
+			*buf++ = *fmt++;
+		}
+		*buf = '\0';
+	}
 }
 
 void update_widget_value(widget_t *widget) {
@@ -989,7 +1279,109 @@ static void parse_areachart_widget(char *line, var_t *var, unsigned int var_coun
 }
 
 static void parse_text_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
-	// TODO
+	text_widget_t *widget_data;
+	widget_t *widget;
+	orientation_t orientation;
+	unsigned long long mult;
+	int x, y, width, height;
+	char orientation_char = 'N';
+	char alignment_char = '7';
+	color_t color;
+	unsigned int i;
+	int n, m;
+	unsigned char alignment;
+	char format[buflen];
+	char font_string[buflen];
+	double factor;
+
+	n = sscanf(line, "%llu %d %d %d %d %c %c #%2hhx%2hhx%2hhx%2hhx %n", &mult, &x, &y,
+			&width, &height, &orientation_char, &alignment_char,
+			&color.r, &color.g, &color.b, &color.a, &m);
+
+	if (n < 11)
+		dief("cannot parse configuration line: text %s", line);
+
+	if (!(n = parse_quoted_string(line + m, font_string)))
+		if ((sscanf(line + m, "%s %n", font_string, &n)) != 1)
+			dief("cannot parse configuration line: text %s", line);
+
+	if (!parse_quoted_string(line + m + n, format))
+		if ((sscanf(line + m + n, "%s", format)) != 1)
+			dief("cannot parse configuration line: text %s", line);
+
+	orientation = parse_orientation(orientation_char);
+
+	switch (alignment_char) {
+		case '1':
+			alignment = 1;
+			break;
+		case '2':
+			alignment = 2;
+			break;
+		case '3':
+			alignment = 3;
+			break;
+		case '4':
+			alignment = 4;
+			break;
+		case '5':
+			alignment = 5;
+			break;
+		case '6':
+			alignment = 6;
+			break;
+		case '7':
+			alignment = 7;
+			break;
+		case '8':
+			alignment = 8;
+			break;
+		case '9':
+			alignment = 9;
+			break;
+		default:
+			debugf("using default alignment for text: %s", line);
+			alignment = 7;
+			break;
+	}
+
+	widget_list_len++;
+	widget_list = (widget_t *) srealloc((void *) widget_list, sizeof(widget_t) * widget_list_len);
+	widget = &(widget_list[widget_list_len - 1]);
+
+	widget->mult = mult;
+	widget->x = x;
+	widget->y = y;
+	widget->width = width;
+	widget->height = height;
+	widget->type = text_widget;
+	widget->var = var;
+	widget->var_count = var_count;
+
+	widget->data = (text_widget_t *) smalloc(sizeof(text_widget_t));
+	widget_data = (text_widget_t *) widget->data;
+	widget_data->orientation = orientation;
+	widget_data->alignment = alignment;
+	widget_data->color = color;
+
+	if (!(widget_data->font = imlib_load_font(font_string)))
+		dief("cannot load font: %s", font_string);
+
+	widget_data->format = (char *) smalloc(strlen(format) + 1);
+	strcpy(widget_data->format, format);
+
+	widget_data->string = (char *) smalloc(buflen);
+
+	widget_data->factor = (double *) smalloc(sizeof(double) * var_count);
+
+	for (i=0; i < var_count; i++) {
+		n = sscanf(varlines[i], "%lf", &factor);
+
+		if (n < 1)
+			factor = 1.0;
+
+		widget_data->factor[i] = factor;
+	}
 }
 
 void parse_widgets(char *buf) {
@@ -1009,6 +1401,9 @@ void parse_widgets(char *buf) {
 
 void default_widgets() {
 	// TODO
+
+	//tick = 100;
+
 	add_stat(1, "cpu_percents");
 //	add_stat(2, "network_io_stats_diff");
 
@@ -1029,11 +1424,16 @@ void default_widgets() {
 		"#00FF0044 #00FF00FF"
 	};
 
+//	static char *varlines3[] = {
+//		"1.0", "1.0"
+//	};
+
 	parse_rectangle_widget("0 0 120 100 #000000FF", NULL, 0, NULL);
 //	parse_line_widget("10 10 60 20 #00FFFFFF", NULL, 0, NULL);
 //	parse_image_widget("0 0 100 100 1.png", NULL, 0, NULL);
 	parse_linechart_widget("1 0 0 120 100 N + 0.0 100.0", &(var_list[1]), 2, varlines);
 	parse_barchart_widget("1 0 0 4 100 N + 0.0 100.0", &(var_list[1]), 2, varlines2);
+//	parse_text_widget("1 0 0 120 100 N 7 #0000FFFF \"Arial_Bold/10\" \"%.2f\n%.2f\"", &(var_list[1]), 2, varlines3);
 //	parse_linechart_widget("2 0 0 120 100 N 0.0", &(var_list[1]), 2, varlines);
 }
 

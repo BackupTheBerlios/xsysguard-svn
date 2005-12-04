@@ -134,12 +134,13 @@ typedef struct {
 
 
 typedef struct {
-	double angle;
+	orientation_t orientation;
+	unsigned short alignment; /* 1-9 */
 	color_t color;
-	char *font;
+	Imlib_Font font;
 	char *format;
-
 	double *factor;
+	char *string;
 } text_widget_t;
 
 /******************************************************************************/
