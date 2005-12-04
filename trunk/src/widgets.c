@@ -19,6 +19,7 @@
  */
 
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -30,7 +31,6 @@
 #include "x11.h"
 #include "widgets.h"
 
-#define NaN sqrt(-1); // FIXME
 #define round(x) ((x)>=0?(int) ((x)+0.5) : (int)((x)-0.5))
 #define max(a, b) ((a) > (b)) ? (a) : (b)
 #define min(a, b) ((a) > (b)) ? (b) : (a)
@@ -994,8 +994,8 @@ static void parse_barchart_widget(char *line, var_t *var, unsigned int var_count
 	boolean static_max = false;
 	color_t color_min;
 	color_t color_max;
-	double min = NaN;
-	double max = NaN;
+	double min = NAN;
+	double max = NAN;
 	int n, m;
 	int i;
 
@@ -1053,7 +1053,7 @@ static void parse_barchart_widget(char *line, var_t *var, unsigned int var_count
 			color_max = color_min;
 		widget_data->color_min[i] = color_min;
 		widget_data->color_max[i] = color_max;
-		widget_data->data[i] = NaN;
+		widget_data->data[i] = NAN;
 	}
 }
 
@@ -1068,8 +1068,8 @@ static void parse_linechart_widget(char *line, var_t *var, unsigned int var_coun
 	boolean static_min = false;
 	boolean static_max = false;
 	color_t color;
-	double min = NaN;
-	double max = NaN;
+	double min = NAN;
+	double max = NAN;
 	int n, m, o, p;
 	int i, j;
 	char filenamei[buflen];
@@ -1150,11 +1150,11 @@ static void parse_linechart_widget(char *line, var_t *var, unsigned int var_coun
 		if (orientation == WEST || orientation == EAST) {
 			widget_data->data[i] = (double *) smalloc(sizeof(double) * height);
 			for (j=0; j < height; j++)
-				widget_data->data[i][j] = NaN;
+				widget_data->data[i][j] = NAN;
 		} else {
 			widget_data->data[i] = (double *) smalloc(sizeof(double) * width);
 			for (j=0; j < width; j++)
-				widget_data->data[i][j] = NaN;
+				widget_data->data[i][j] = NAN;
 		}
 	}
 }
@@ -1173,8 +1173,8 @@ static void parse_areachart_widget(char *line, var_t *var, unsigned int var_coun
 	color_t color_max;
 	color_t color_top;
 	unsigned int top_pixel;
-	double min = NaN;
-	double max = NaN;
+	double min = NAN;
+	double max = NAN;
 	int n, m, o, p;
 	int i, j;
 	char filenamei[buflen];
@@ -1269,11 +1269,11 @@ static void parse_areachart_widget(char *line, var_t *var, unsigned int var_coun
 		if (orientation == WEST || orientation == EAST) {
 			widget_data->data[i] = (double *) smalloc(sizeof(double) * height);
 			for (j=0; j < height; j++)
-				widget_data->data[i][j] = NaN;
+				widget_data->data[i][j] = NAN;
 		} else {
 			widget_data->data[i] = (double *) smalloc(sizeof(double) * width);
 			for (j=0; i < width; j++)
-				widget_data->data[i][j] = NaN;
+				widget_data->data[i][j] = NAN;
 		}
 	}
 }
