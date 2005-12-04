@@ -320,6 +320,8 @@ void render_widgets_on_drawable() {
 	widget_t *widget;
 	int i, up_x, up_y, up_w, up_h;
 
+	updates = imlib_updates_merge_for_rendering(updates, width, height);
+
 	for (update = updates; update; update = imlib_updates_get_next(update)) {
 		imlib_updates_get_coordinates(update, &up_x, &up_y, &up_w, &up_h);
 		buffer = imlib_create_image(up_w, up_h);
