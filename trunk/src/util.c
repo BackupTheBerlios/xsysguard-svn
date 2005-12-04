@@ -101,6 +101,9 @@ int parse_quoted_string(char *source, char *dest) {
 	if (!source || !dest)
 		return 0;
 
+	while (isspace((int) *c))
+		c++;
+
 	if (*c++ != '\"')
 		return 0;
 
