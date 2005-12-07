@@ -466,17 +466,29 @@ void render_widgets_on_drawable() {
 	Imlib_Image buffer;
 	Imlib_Updates update;
 	widget_t *widget;
+	DATA32 *imgdata;
 	int i, up_x, up_y, up_w, up_h;
 
 	updates = imlib_updates_merge_for_rendering(updates, width, height);
 
 	for (update = updates; update; update = imlib_updates_get_next(update)) {
 		imlib_updates_get_coordinates(update, &up_x, &up_y, &up_w, &up_h);
+
 		buffer = imlib_create_image(up_w, up_h);
 		imlib_context_set_image(buffer);
 		imlib_image_set_has_alpha(1);
+
+		imgdata = imlib_image_get_data();
+		memset(imgdata, 0, up_w * up_h * sizeof(DATA32));
+		imlib_image_put_back_data(imgdata);
+
 		for (i=0; i < widget_list_len; i++) {
 			widget = &(widget_list[i]);
+
+			if (!((up_x + up_w > widget->x) && (widget->x + widget->width > up_x) &&
+				(up_y + up_h > widget->y) && (widget->y + widget->height > up_y)))
+					break;
+
 			imlib_context_set_image(buffer);
 			imlib_context_set_cliprect(widget->x - up_x, widget->y - up_y,
 					widget->width, widget->height);
@@ -506,9 +518,9 @@ void render_widgets_on_drawable() {
 					dief("unknown widget type %hhd", widget->type);
 					break;
 			}
-			imlib_context_set_cliprect(0, 0, 0, 0);
 		}
 		imlib_context_set_image(buffer);
+		imlib_context_set_cliprect(0, 0, 0, 0);
 		imlib_render_image_on_drawable(up_x, up_y);
 		imlib_free_image();
 	}
@@ -555,7 +567,7 @@ static void update_linechart_widget_value(widget_t *widget) {
 
 	imlib_context_set_image(widget_data->img);
 	imgdata = imlib_image_get_data();
-	memset((unsigned char *) imgdata, 0, widget->width * widget->height * 4);
+	memset(imgdata, 0, widget->width * widget->height * sizeof(DATA32));
 	imlib_image_put_back_data(imgdata);
 
 	index = widget_data->data_index;
@@ -1179,6 +1191,7 @@ static void parse_areachart_widget(char *line, var_t *var, unsigned int var_coun
 	int i, j;
 	char filenamei[buflen];
 	char *filename = filenamei;
+	DATA32 *imgdata;
 
 	n = sscanf(line, "%llu %d %d %d %d %c %n", &mult, &x, &y, &width, &height, &orientation_char, &m);
 
@@ -1242,6 +1255,9 @@ static void parse_areachart_widget(char *line, var_t *var, unsigned int var_coun
 
 	imlib_context_set_image(widget_data->img);
 	imlib_image_set_has_alpha(1);
+	imgdata = imlib_image_get_data();
+	memset(imgdata, 0, width * height * sizeof(DATA32));
+	imlib_image_put_back_data(imgdata);
 
 	widget_data->color_min = (color_t *) smalloc(sizeof(color_t) * var_count);
 	widget_data->color_max = (color_t *) smalloc(sizeof(color_t) * var_count);
