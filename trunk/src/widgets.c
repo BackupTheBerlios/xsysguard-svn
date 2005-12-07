@@ -487,7 +487,7 @@ void render_widgets_on_drawable() {
 
 			if (!((up_x + up_w > widget->x) && (widget->x + widget->width > up_x) &&
 				(up_y + up_h > widget->y) && (widget->y + widget->height > up_y)))
-					break;
+					continue;
 
 			imlib_context_set_image(buffer);
 			imlib_context_set_cliprect(widget->x - up_x, widget->y - up_y,
