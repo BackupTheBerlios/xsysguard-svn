@@ -145,6 +145,7 @@ typedef struct {
 
 /******************************************************************************/
 
+char *expand_filename(char *name);
 void render_widgets_on_drawable();
 void update_widgets();
 void update_widget_value(widget_t *widget);

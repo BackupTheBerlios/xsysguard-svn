@@ -130,21 +130,49 @@ void add_daemon() {
 
 /******************************************************************************/
 
+int parse_config(char *buffer) {
+	// TODO
+	return 0;
+}
+
+/******************************************************************************/
+
 int main(int argc, char **argv) {
 
 	struct timeval time_out;
 	unsigned int i;
 	fd_set fds;
 	int xfd, fd_max, fd_count;
+	char *config_filename, *config_buffer, *buffer;
+	struct stat attr;
+	int fd;
 
+	if (argc > 1)
+		config_filename = argv[1];
+	else
+		config_filename = "~/.xsysguard/config";
 
-	// TODO: read configuration into buffer
+	config_filename = expand_filename(config_filename);
 
-	init_font_path();
-
-	// TODO: parse configuration
-
-	default_widgets();
+	// read configuration
+	if ((fd = open(config_filename, O_RDONLY, 0)) >= 0) {
+		if (fstat(fd, &attr) == -1)
+			dief("cannot stat config file: %s", config_filename);
+		config_buffer = (char *) smalloc(attr.st_size + 1);
+		memset(config_buffer, 0, attr.st_size + 1);
+		if (read(fd, config_buffer, attr.st_size) < attr.st_size)
+			dief("cannot read config file: %s", config_filename);
+		close(fd);
+		buffer = config_buffer;
+		buffer += parse_config(buffer);
+		init_font_path();
+		parse_widgets(buffer);
+		free(config_buffer);
+	} else {
+		debugf("cannot find configuration file, using default config");
+		init_font_path();
+		default_widgets();
+	}
 
 	// init libstatgrab & x11
 	init_stats();

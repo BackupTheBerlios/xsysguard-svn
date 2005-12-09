@@ -42,30 +42,25 @@ static unsigned int widget_list_len = 0;
 
 /******************************************************************************/
 
-static void expand_filename(char **name) {
+char *expand_filename(char *name) {
 	char *home;
 	char *new;
 
 	home = getenv("HOME");
-	if (!home)
-		return;
-
-	if (*name[0] == '~') {
-		new = (char *) smalloc(strlen(*name) + strlen(home) + 1 - 1);
+	if (!home) {
+		new = (char *) smalloc(strlen(name) + 1);
+		strcpy(new, name);
+	} else if (name[0] == '~') {
+		new = (char *) smalloc(strlen(name) + strlen(home) + 1 - 1);
 		strcpy(new, home);
-		strcat(new, *name + 1);
-		//free(*name);
-		*name = new;
-		printf("%s\n", *name);
-	}
-	if (*name[0] != '/') {
-		new = (char *) smalloc(strlen(*name) + strlen(home) + 1 + 12);
+		strcat(new, name + 1);
+	} else if (name[0] != '/') {
+		new = (char *) smalloc(strlen(name) + strlen(home) + 1 + 12);
 		strcpy(new, home);
 		strcat(new, "/.xsysguard/");
-		strcat(new, *name);
-		//free(*name);
-		*name = new;
+		strcat(new, name);
 	}
+	return new;
 }
 
 static orientation_t parse_orientation(char orientation_char) {
@@ -1111,9 +1106,7 @@ static void parse_image_widget(char *line, var_t *var, unsigned int var_count, c
 
 	widget->data = (image_widget_t *) smalloc(sizeof(image_widget_t));
 	widget_data = (image_widget_t *) widget->data;
-	widget_data->filename = (char *) smalloc(strlen(filename) + 1);
-	strcpy(widget_data->filename, filename);
-	expand_filename(&widget_data->filename);
+	widget_data->filename = expand_filename(filename);
 }
 
 static void parse_barchart_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
@@ -1258,13 +1251,10 @@ static void parse_linechart_widget(char *line, var_t *var, unsigned int var_coun
 	widget_data->min = min;
 	widget_data->max = max;
 
-	if (filename) {
-		widget_data->bgfile = (char *) smalloc(strlen(filename) + 1);
-		strcpy(widget_data->bgfile, filename);
-		expand_filename(&widget_data->bgfile);
-	} else {
+	if (filename)
+		widget_data->bgfile = expand_filename(filename);
+	else
 		widget_data->bgfile = filename;
-	}
 
 	widget_data->img = imlib_create_image(width, height);
 	widget_data->data_index = 0;
@@ -1364,13 +1354,10 @@ static void parse_areachart_widget(char *line, var_t *var, unsigned int var_coun
 	widget_data->min = min;
 	widget_data->max = max;
 
-	if (filename) {
-		widget_data->bgfile = (char *) smalloc(strlen(filename) + 1);
-		strcpy(widget_data->bgfile, filename);
-		expand_filename(&widget_data->bgfile);
-	} else {
+	if (filename)
+		widget_data->bgfile = expand_filename(filename);
+	else
 		widget_data->bgfile = filename;
-	}
 
 	widget_data->img = imlib_create_image(width, height);
 	widget_data->data_index = 0;
@@ -1538,40 +1525,30 @@ void parse_widgets(char *buf) {
 /******************************************************************************/
 
 void default_widgets() {
-	// TODO
 
-	//tick = 100;
-
-	add_stat(1, "cpu_percents");
-//	add_stat(2, "network_io_stats_diff");
-
-	var_list_len = 3;
+	var_list_len = 6;
 	var_list = (var_t *) smalloc(sizeof(var_t) * var_list_len);
 
-	set_stat_var(&(var_list[1]), 1, 1, "cpu_percents", "kernel", NULL);
-	set_stat_var(&(var_list[2]), 1, 2, "cpu_percents", "user", NULL);
-//	set_stat_var(&(var_list[1]), 1, 1, "network_io_stats_diff", "tx", "eth0");
-//	set_stat_var(&(var_list[2]), 1, 2, "network_io_stats_diff", "rx", "eth0");
+	if (!set_var(&(var_list[1]), 1, 1, "cpu_percents:kernel"))
+		dief("cannot set var: cpu_percents:kernel");
+	if (!set_var(&(var_list[2]), 2, 1, "cpu_percents:user"))
+		dief("cannot set var: cpu_percents:user");
+	if (!set_var(&(var_list[3]), 3, 1, "cpu_percents:iowait"))
+		dief("cannot set var: cpu_percents:iowait");
+	if (!set_var(&(var_list[4]), 4, 1, "cpu_percents:swap"))
+		dief("cannot set var: cpu_percents:swap");
+	if (!set_var(&(var_list[5]), 5, 1, "cpu_percents:nice"))
+		dief("cannot set var: cpu_percents:nice");
 
 	static char *varlines[] = {
-		"#FF0000FF",
-		"#00FF00FF"
-	};
-	static char *varlines2[] = {
-		"#FF000044 #FF0000FF",
-		"#00FF0044 #00FF00FF"
-	};
-
-	static char *varlines3[] = {
-		"1.0", "1.0"
+		"#88000088 #FF0000FF",
+		"#00880088 #00FF00FF",
+		"#00008888 #0000FFFF",
+		"#88008888 #FF00FFFF",
+		"#88880088 #FFFF00FF"
 	};
 
 	parse_rectangle_widget("0 0 120 100 #000000FF", NULL, 0, NULL);
-//	parse_line_widget("10 10 60 20 #00FFFFFF", NULL, 0, NULL);
-//	parse_image_widget("0 0 100 100 1.png", NULL, 0, NULL);
-	parse_areachart_widget("1 0 0 120 100 N + 0.0 100.0", &(var_list[1]), 2, varlines);
-	parse_barchart_widget("1 0 0 4 100 N + 0.0 100.0", &(var_list[1]), 2, varlines2);
-	parse_text_widget("1 0 0 120 100 N 7 #0000FFFF \"Arial/8\" \"%.2f\n%.2f\"", &(var_list[1]), 2, varlines3);
-//	parse_linechart_widget("2 0 0 120 100 N 0.0", &(var_list[1]), 2, varlines);
+	parse_areachart_widget("1 0 0 120 100 N + 0.0 100.0", &(var_list[1]), 5, varlines);
 }
 
