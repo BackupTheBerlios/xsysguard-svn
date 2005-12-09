@@ -40,7 +40,7 @@ clean distclean:
 	rm -f xsysguardd
 	rm -f xsysguard
 
-install:
+install: xsysguard xsysguardd
 	cp xsysguardd $(DESTDIR)/bin
 	cp xsysguard $(DESTDIR)/bin
 
