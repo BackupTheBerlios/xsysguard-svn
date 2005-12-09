@@ -2079,7 +2079,7 @@ void add_stat(unsigned long long mult, char *name) {
 	}
 	// no matching entry found in stat_list -> add new entry
 	stat_list_len++;
-	stat_list = (stat_t *) realloc((void *) stat_list, sizeof(stat_t) * stat_list_len);
+	stat_list = (stat_t *) srealloc((void *) stat_list, sizeof(stat_t) * stat_list_len);
 	stat = &(stat_list[stat_list_len - 1]);
 	stat->mult = mult;
 	stat->func = stat_define->func;
