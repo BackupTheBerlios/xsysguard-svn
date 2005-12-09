@@ -529,7 +529,7 @@ static void update_barchart_widget_value(widget_t *widget) {
 	widget_data = (barchart_widget_t *) widget->data;
 
 	for (i=0; i < widget->var_count; i++) {
-		var = &(widget->var[i]);
+		var = &(var_list[widget->var_id + i]);
 		widget_data->data[i] = get_as_double(var->type, var->id, (*(var->func))(var));
 	}
 }
@@ -564,7 +564,7 @@ static void update_linechart_widget_value(widget_t *widget) {
 	//TODO background
 
 	for (i=0; i < widget->var_count; i++) {
-		var = &(widget->var[i]);
+		var = &(var_list[widget->var_id + i]);
 		data = widget_data->data[i];
 		data[index] = get_as_double(var->type, var->id, (*(var->func))(var));
 	}
@@ -670,7 +670,7 @@ static void update_areachart_widget_value(widget_t *widget) {
 	// TODO top_pixel/color_top
 
 	for (i=0; i < widget->var_count; i++) {
-		var = &(widget->var[i]);
+		var = &(var_list[widget->var_id + i]);
 		data = widget_data->data[i];
 		data[index] = get_as_double(var->type, var->id, (*(var->func))(var));
 	}
@@ -812,7 +812,7 @@ static void update_text_widget_value(widget_t *widget) {
 	for (i=0; i < widget->var_count; i++) {
 		if (!*bufi)
 			return;
-		var = &(widget->var[i]);
+		var = &(var_list[widget->var_id + i]);
 		len = buflen - (str - widget_data->string);
 		switch (var->type) {
 			case string_type: {
@@ -1007,7 +1007,7 @@ void update_widgets() {
 
 /******************************************************************************/
 
-static void parse_line_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
+static void parse_line_widget(char *line, unsigned int var_id, unsigned int var_count, char **varlines) {
 	line_widget_t *widget_data;
 	widget_t *widget;
 	int x1, y1, x2, y2;
@@ -1036,7 +1036,7 @@ static void parse_line_widget(char *line, var_t *var, unsigned int var_count, ch
 	widget->width = width;
 	widget->height = height;
 	widget->type = line_widget;
-	widget->var = var;
+	widget->var_id = var_id;
 	widget->var_count = var_count;
 
 	widget->data = (line_widget_t *) smalloc(sizeof(line_widget_t));
@@ -1044,7 +1044,7 @@ static void parse_line_widget(char *line, var_t *var, unsigned int var_count, ch
 	widget_data->color = color;
 }
 
-static void parse_rectangle_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
+static void parse_rectangle_widget(char *line, unsigned int var_id, unsigned int var_count, char **varlines) {
 	rectangle_widget_t *widget_data;
 	widget_t *widget;
 	int x, y, width, height;
@@ -1067,7 +1067,7 @@ static void parse_rectangle_widget(char *line, var_t *var, unsigned int var_coun
 	widget->width = width;
 	widget->height = height;
 	widget->type = rectangle_widget;
-	widget->var = var;
+	widget->var_id = var_id;
 	widget->var_count = var_count;
 
 	widget->data = (rectangle_widget_t *) smalloc(sizeof(rectangle_widget_t));
@@ -1075,7 +1075,7 @@ static void parse_rectangle_widget(char *line, var_t *var, unsigned int var_coun
 	widget_data->color = color;
 }
 
-static void parse_image_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
+static void parse_image_widget(char *line, unsigned int var_id, unsigned int var_count, char **varlines) {
 	image_widget_t *widget_data;
 	widget_t *widget;
 	int x, y, width, height;
@@ -1101,7 +1101,7 @@ static void parse_image_widget(char *line, var_t *var, unsigned int var_count, c
 	widget->width = width;
 	widget->height = height;
 	widget->type = image_widget;
-	widget->var = var;
+	widget->var_id = var_id;
 	widget->var_count = var_count;
 
 	widget->data = (image_widget_t *) smalloc(sizeof(image_widget_t));
@@ -1109,7 +1109,7 @@ static void parse_image_widget(char *line, var_t *var, unsigned int var_count, c
 	widget_data->filename = expand_filename(filename);
 }
 
-static void parse_barchart_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
+static void parse_barchart_widget(char *line, unsigned int var_id, unsigned int var_count, char **varlines) {
 	barchart_widget_t *widget_data;
 	widget_t *widget;
 	orientation_t orientation;
@@ -1154,7 +1154,7 @@ static void parse_barchart_widget(char *line, var_t *var, unsigned int var_count
 	widget->width = width;
 	widget->height = height;
 	widget->type = barchart_widget;
-	widget->var = var;
+	widget->var_id = var_id;
 	widget->var_count = var_count;
 
 	widget->data = (barchart_widget_t *) smalloc(sizeof(barchart_widget_t));
@@ -1184,7 +1184,7 @@ static void parse_barchart_widget(char *line, var_t *var, unsigned int var_count
 	}
 }
 
-static void parse_linechart_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
+static void parse_linechart_widget(char *line, unsigned int var_id, unsigned int var_count, char **varlines) {
 	linechart_widget_t *widget_data;
 	widget_t *widget;
 	orientation_t orientation;
@@ -1239,7 +1239,7 @@ static void parse_linechart_widget(char *line, var_t *var, unsigned int var_coun
 	widget->width = width;
 	widget->height = height;
 	widget->type = linechart_widget;
-	widget->var = var;
+	widget->var_id = var_id;
 	widget->var_count = var_count;
 
 	widget->data = (linechart_widget_t *) smalloc(sizeof(linechart_widget_t));
@@ -1283,7 +1283,7 @@ static void parse_linechart_widget(char *line, var_t *var, unsigned int var_coun
 	}
 }
 
-static void parse_areachart_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
+static void parse_areachart_widget(char *line, unsigned int var_id, unsigned int var_count, char **varlines) {
 	areachart_widget_t *widget_data;
 	widget_t *widget;
 	orientation_t orientation;
@@ -1342,7 +1342,7 @@ static void parse_areachart_widget(char *line, var_t *var, unsigned int var_coun
 	widget->width = width;
 	widget->height = height;
 	widget->type = areachart_widget;
-	widget->var = var;
+	widget->var_id = var_id;
 	widget->var_count = var_count;
 
 	widget->data = (areachart_widget_t *) smalloc(sizeof(areachart_widget_t));
@@ -1403,7 +1403,7 @@ static void parse_areachart_widget(char *line, var_t *var, unsigned int var_coun
 	}
 }
 
-static void parse_text_widget(char *line, var_t *var, unsigned int var_count, char **varlines) {
+static void parse_text_widget(char *line, unsigned int var_id, unsigned int var_count, char **varlines) {
 	text_widget_t *widget_data;
 	widget_t *widget;
 	orientation_t orientation;
@@ -1480,7 +1480,7 @@ static void parse_text_widget(char *line, var_t *var, unsigned int var_count, ch
 	widget->width = width;
 	widget->height = height;
 	widget->type = text_widget;
-	widget->var = var;
+	widget->var_id = var_id;
 	widget->var_count = var_count;
 
 	widget->data = (text_widget_t *) smalloc(sizeof(text_widget_t));
@@ -1512,13 +1512,13 @@ static void parse_text_widget(char *line, var_t *var, unsigned int var_count, ch
 void parse_widgets(char *buf) {
 	// TODO
 	if (false) {
-		parse_line_widget(NULL, NULL, 0, NULL);
-		parse_rectangle_widget(NULL, NULL, 0, NULL);
-		parse_image_widget(NULL, NULL, 0, NULL);
-		parse_barchart_widget(NULL, NULL, 0, NULL);
-		parse_linechart_widget(NULL, NULL, 0, NULL);
-		parse_areachart_widget(NULL, NULL, 0, NULL);
-		parse_text_widget(NULL, NULL, 0, NULL);
+		parse_line_widget(NULL, 0, 0, NULL);
+		parse_rectangle_widget(NULL, 0, 0, NULL);
+		parse_image_widget(NULL, 0, 0, NULL);
+		parse_barchart_widget(NULL, 0, 0, NULL);
+		parse_linechart_widget(NULL, 0, 0, NULL);
+		parse_areachart_widget(NULL, 0, 0, NULL);
+		parse_text_widget(NULL, 0, 0, NULL);
 	}
 }
 
@@ -1548,7 +1548,7 @@ void default_widgets() {
 		"#88880088 #FFFF00FF"
 	};
 
-	parse_rectangle_widget("0 0 120 100 #000000FF", NULL, 0, NULL);
-	parse_areachart_widget("1 0 0 120 100 N + 0.0 100.0", &(var_list[1]), 5, varlines);
+	parse_rectangle_widget("0 0 120 100 #000000FF", 0, 0, NULL);
+	parse_areachart_widget("1 0 0 120 100 N + 0.0 100.0", 1, 5, varlines);
 }
 

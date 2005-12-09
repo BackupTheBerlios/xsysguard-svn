@@ -60,7 +60,7 @@ typedef struct {
 		text_widget
 	} type;
 
-	var_t *var;
+	unsigned int var_id;
 	unsigned int var_count;
 
 	void *data;
