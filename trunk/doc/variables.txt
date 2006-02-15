@@ -1,0 +1,345 @@
+# <daemon>:scanf:<filename>:<format>
+localhost:scanf:"/proc/stat":"cpu %*d %d"
+
+# <daemon>:regexp:<filename>:<regexp>
+localhost:regexp:"/proc/stat":"cpu \d+ (\d+)"
+
+# <daemon>:strftime:<format> returns string (char pointer)
+localhost:strftime:"%a %b %e / %H:%M:%S"
+
+# <daemon>:host_info:os_name returns string (char pointer)
+localhost:host_info:os_name
+
+# <daemon>:host_info:os_release returns string (char pointer)
+localhost:host_info:os_release
+
+# <daemon>:host_info:os_version returns string (char pointer)
+localhost:host_info:os_version
+
+# <daemon>:host_info:platform returns string (char pointer)
+localhost:host_info:platform
+
+# <daemon>:host_info:hostname returns string (char pointer)
+localhost:host_info:hostname
+
+# <daemon>:host_info:uptime:<format> returns string (char pointer)
+localhost:host_info:uptime:"%d days, %h:%m:%s"
+
+# <daemon>:cpu_stats:user returns long long integer
+localhost:cpu_stats:user
+
+# <daemon>:cpu_stats:kernel returns long long integer
+localhost:cpu_stats:kernel
+
+# <daemon>:cpu_stats:idle returns long long integer
+localhost:cpu_stats:idle
+
+# <daemon>:cpu_stats:iowait returns long long integer
+localhost:cpu_stats:iowait
+
+# <daemon>:cpu_stats:swap returns long long integer
+localhost:cpu_stats:swap
+
+# <daemon>:cpu_stats:nice returns long long integer
+localhost:cpu_stats:nice
+
+# <daemon>:cpu_stats:total returns long long integer
+localhost:cpu_stats:total
+
+# <daemon>:cpu_stats_diff:user returns long long integer
+localhost:cpu_stats_diff:user
+
+# <daemon>:cpu_stats_diff:kernel returns long long integer
+localhost:cpu_stats_diff:kernel
+
+# <daemon>:cpu_stats_diff:idle returns long long integer
+localhost:cpu_stats_diff:idle
+
+# <daemon>:cpu_stats_diff:iowait returns long long integer
+localhost:cpu_stats_diff:iowait
+
+# <daemon>:cpu_stats_diff:swap returns long long integer
+localhost:cpu_stats_diff:swap
+
+# <daemon>:cpu_stats_diff:nice returns long long integer
+localhost:cpu_stats_diff:nice
+
+# <daemon>:cpu_stats_diff:total returns long long integer
+localhost:cpu_stats_diff:total
+
+# <daemon>:cpu_percents:user returns float
+localhost:cpu_percents:user
+
+# <daemon>:cpu_percents:kernel returns float
+localhost:cpu_percents:kernel
+
+# <daemon>:cpu_percents:idle returns float
+localhost:cpu_percents:idle
+
+# <daemon>:cpu_percents:iowait returns float
+localhost:cpu_percents:iowait
+
+# <daemon>:cpu_percents:swap returns float
+localhost:cpu_percents:swap
+
+# <daemon>:cpu_percents:nice returns float
+localhost:cpu_percents:nice
+
+# <daemon>:mem_stats:total returns long long integer
+localhost:mem_stats:total
+
+# <daemon>:mem_stats:free returns long long integer
+localhost:mem_stats:free
+
+# <daemon>:mem_stats:used returns long long integer
+localhost:mem_stats:used
+
+# <daemon>:mem_stats:cache returns long long integer
+localhost:mem_stats:cache
+
+# <daemon>:load_stats:min1 returns double
+localhost:load_stats:min1
+
+# <daemon>:load_stats:min5 returns double
+localhost:load_stats:min5
+
+# <daemon>:load_stats:min15 returns double
+localhost:load_stats:min15
+
+# <daemon>:user_stats:name_list returns string (char pointer)
+localhost:user_stats:name_list
+
+# <daemon>:user_stats:num_entries returns integer
+localhost:user_stats:num_entries
+
+# <daemon>:swap_stats:total returns long long integer
+localhost:swap_stats:total
+
+# <daemon>:swap_stats:used returns long long integer
+localhost:swap_stats:used
+
+# <daemon>:swap_stats:free returns long long integer
+localhost:swap_stats:free
+
+# <daemon>:fs_stats:device_name:<device_name>|<mnt_point> returns string (char pointer)
+localhost:fs_stats:device_name:"/"
+
+# <daemon>:fs_stats:fs_type:<device_name>|<mnt_point> returns string (char pointer)
+localhost:fs_stats:fs_type:"/dev/hda1"
+
+# <daemon>:fs_stats:mnt_point:<device_name>|<mnt_point> returns string (char pointer)
+localhost:fs_stats:mnt_point:"/dev/hda1"
+
+# <daemon>:fs_stats:size:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:size:"/dev/hda1"
+
+# <daemon>:fs_stats:used:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:used:"/dev/hda1"
+
+# <daemon>:fs_stats:avail:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:avail:"/dev/hda1"
+
+# <daemon>:fs_stats:total_inodes:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:total_inodes:"/dev/hda1"
+
+# <daemon>:fs_stats:used_inodes:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:used_inodes:"/dev/hda1"
+
+# <daemon>:fs_stats:free_inodes:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:free_inodes:"/dev/hda1"
+
+# <daemon>:fs_stats:avail_inodes:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:avail_inodes:"/dev/hda1"
+
+# <daemon>:fs_stats:io_size:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:io_size:"/dev/hda1"
+
+# <daemon>:fs_stats:block_size:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:block_size:"/dev/hda1"
+
+# <daemon>:fs_stats:total_blocks:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:total_blocks:"/dev/hda1"
+
+# <daemon>:fs_stats:free_blocks:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:free_blocks:"/dev/hda1"
+
+# <daemon>:fs_stats:used_blocks:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:used_blocks:"/dev/hda1"
+
+# <daemon>:fs_stats:avail_blocks:<device_name>|<mnt_point> returns long long integer
+localhost:fs_stats:avail_blocks:"/dev/hda1"
+
+# <daemon>:disk_io_stats:read_bytes:<disk_name> returns long long integer
+localhost:disk_io_stats:read_bytes:"hda"
+
+# <daemon>:disk_io_stats:write_bytes:<disk_name> returns long long integer
+localhost:disk_io_stats:write_bytes:"hda"
+
+# <daemon>:disk_io_stats_diff:read_bytes:<disk_name> returns long long integer
+localhost:disk_io_stats_diff:read_bytes:"hda"
+
+# <daemon>:disk_io_stats_diff:write_bytes:<disk_name> returns long long integer
+localhost:disk_io_stats_diff:write_bytes:"hda"
+
+# <daemon>:network_io_stats:tx:<interface_name> returns long long integer
+localhost:network_io_stats:tx:"eth0"
+
+# <daemon>:network_io_stats:rx:<interface_name> returns long long integer
+localhost:network_io_stats:rx:"eth0"
+
+# <daemon>:network_io_stats:ipackets:<interface_name> returns long long integer
+localhost:network_io_stats:ipackets:"eth0"
+
+# <daemon>:network_io_stats:opackets:<interface_name> returns long long integer
+localhost:network_io_stats:opackets:"eth0"
+
+# <daemon>:network_io_stats:ierrors:<interface_name> returns long long integer
+localhost:network_io_stats:ierrors:"eth0"
+
+# <daemon>:network_io_stats:oerrors:<interface_name> returns long long integer
+localhost:network_io_stats:oerrors:"eth0"
+
+# <daemon>:network_io_stats:collisions:<interface_name> returns long long integer
+localhost:network_io_stats:collisions:"eth0"
+
+# <daemon>:network_io_stats_diff:tx:<interface_name> returns long long integer
+localhost:network_io_stats_diff:tx:"eth0"
+
+# <daemon>:network_io_stats_diff:rx:<interface_name> returns long long integer
+localhost:network_io_stats_diff:rx:"eth0"
+
+# <daemon>:network_io_stats_diff:ipackets:<interface_name> returns long long integer
+localhost:network_io_stats_diff:ipackets:"eth0"
+
+# <daemon>:network_io_stats_diff:opackets:<interface_name> returns long long integer
+localhost:network_io_stats_diff:opackets:"eth0"
+
+# <daemon>:network_io_stats_diff:ierrors:<interface_name> returns long long integer
+localhost:network_io_stats_diff:ierrors:"eth0"
+
+# <daemon>:network_io_stats_diff:oerrors:<interface_name> returns long long integer
+localhost:network_io_stats_diff:oerrors:"eth0"
+
+# <daemon>:network_io_stats_diff:collisions:<interface_name> returns long long integer
+localhost:network_io_stats_diff:collisions:"eth0"
+
+# <daemon>:network_iface_stats:speed:<interface_name> returns integer
+localhost:network_iface_stats:speed:"eth0"
+
+# <daemon>:network_iface_stats:duplex:<interface_name> returns string (char pointer)
+localhost:network_iface_stats:duplex:"eth0"
+
+# <daemon>: page_stats:pages_pagein returns long long integer
+localhost:page_stats:pages_pagein
+
+# <daemon>:page_stats:pages_pageout returns long long integer
+localhost:page_stats:pages_pageout
+
+# <daemon>:page_stats_diff:pages_pagein returns long long integer
+localhost:page_stats_diff:pages_pagein
+
+# <daemon>:page_stats_diff:pages_pageout returns long long integer
+localhost:page_stats_diff:pages_pageout
+
+# <daemon>:process_stats:process_name:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:process_name:10:name:r
+
+# <daemon>:process_stats:proctitle:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:proctitle:10:name
+
+# <daemon>:process_stats:pid:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:pid:10:pid
+
+# <daemon>:process_stats:parent:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:parent:10:pid
+
+# <daemon>:process_stats:pgid:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:pgid:10:pid
+
+# <daemon>:process_stats:uid:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:uid:10:uid
+
+# <daemon>:process_stats:euid:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:euid:10:uid
+
+# <daemon>:process_stats:gid:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:gid:10:gid
+
+# <daemon>:process_stats:egid:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:egid:10:gid
+
+# <daemon>:process_stats:proc_size:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:proc_size:10:size
+
+# <daemon>:process_stats:proc_resident:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:proc_resident:10:res
+
+# <daemon>:process_stats:time_spent:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:time_spent:10:time
+
+# <daemon>:process_stats:cpu_percent:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:cpu_percent:10:cpu
+
+# <daemon>:process_stats:nice:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:nice:10:name
+
+# <daemon>:process_stats:state:<number>:<ordered_by>[:r] returns string (char pointer)
+localhost:process_stats:state:10:name
+
+# <daemon>:process_count:total returns integer
+localhost:process_count:total
+
+# <daemon>:process_count:running returns integer
+localhost:process_count:running
+
+# <daemon>:process_count:sleeping returns integer
+localhost:process_count:sleeping
+
+# <daemon>:process_count:stopped returns integer
+localhost:process_count:stopped
+
+# <daemon>:process_count:zombie returns integer
+localhost:process_count:zombie
+
+# <daemon>:char:<char> returns char
+localhost:char:127
+
+# <daemon>:uchar:<uchar> returns unsigned char
+localhost:uchar:255
+
+# <daemon>:short:<short> returns short integer
+localhost:short:32767
+
+# <daemon>:ushort:<ushort> returns unsigned short integer
+localhost:ushort:65535
+
+# <daemon>:int:<int> returns integer
+localhost:int:2147483648
+
+# <daemon>:uint:<uint> returns unsigned integer
+localhost:uint:4294967295
+
+# <daemon>:long:<long> returns long integer
+localhost:long:2147483648
+
+# <daemon>:ulong:<ulong> returns unsigned long integer
+localhost:ulong:4294967295
+
+# <daemon>:longlong:<longlong> returns long long integer
+localhost:longlong:9223372036854775807
+
+# <daemon>:ulonglong:<ulonglong> returns unsigned long long integer
+localhost:ulonglong:18446744073709551615
+
+# <daemon>:float:<float> returns float
+localhost:float:99.99
+
+# <daemon>:double:<double> returns double
+localhost:double:99.99
+
+# <daemon>:longdouble:<longdouble> returns long double
+localhost:longdouble:99.99
+
+# <daemon>:string:<string> returns string (char pointer)
+localhost:string:"test string"
+
