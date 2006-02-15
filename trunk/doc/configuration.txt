@@ -1,0 +1,86 @@
+# Set Tick <ms>
+Set Tick 1000
+
+# Set Geometry [<width>{xX}<height>][{+-}<xoffset>{+-}<yoffset>]
+Set Geometry 200x120-60+60
+
+# Set HideWindowDecorations
+Set HideWindowDecorations
+
+# Set Layer {Top|Bottom}
+Set Layer Bottom
+
+# Set GrabRoot
+Set GrabRoot
+
+# Set AntiAlias
+Set AntiAlias
+
+# Set ImlibCacheSize <bytes>
+Set ImlibCacheSize 1048576
+
+# Set ImlibFontPath <path>
+Set ImlibFontPath "~/.fonts:/usr/share/fonts/truetype:/usr/X11R6/lib/X11/fonts/TrueType"
+
+# Set ImageFontPath <path>
+Set ImageFontPath "~/.xsysguard/fonts:/usr/share/xsysguard/fonts"
+
+# Set ImagePath <path>
+Set ImagePath "~/.xsysguard/images:/usr/share/xsysguard/images"
+
+# Set XShape
+Set XShape
+
+# Set ARGBVisual
+Set ARGBVisual
+
+# Daemon <daemon> <command>
+Daemon remotehost "ssh login@remote.host.name xsysguardd"
+
+# Line <x1> <y1> <x2> <y2> <color>
+Line 10 10 150 90 FF0000FF
+
+# Rectangle <x> <y> <width> <height> <color> [Filled] [ColorRange <distance> <color> ...]
+Rectangle 10 10 140 80 FF0000FF ColorRange 50 00FF00FF 100 00000000
+
+# Ellipse <xc> <yc> <a> <b> <color> [Filled]
+Ellipse 80 50 140 80 FF0000FF
+
+# Polygon <x> <y> <x> <y> ... <color> [Filled|Closed]
+Polygon 10 10 150 10 80 90 FF0000FF Closed
+
+# Image <x> <y> <image> [Scale <width> <height>] [MergeAlpha]
+Image 10 10 "test.png"
+
+# BarChart <update> <x> <y> <width> <height> [North|West|East|South] [Min <min>] [Max <max>] [Mask <image>]
+# + <var> <color> [ColorRange <distance> <color> ...] [AddPrev] [Add <add>] [Mult <mult>]
+BarChart 1 10 10 100 60 North Min 0.0 Max 100.0
++ localhost:cpu_percents:kernel FF0000FF
++ localhost:cpu_percents:user 00FF00FF AddPrev
++ localhost:cpu_percents:nice FFFF00FF AddPrev
+
+# LineChart <update> <x> <y> <width> <height> [North|West|East|South] [Min <min>] [Max <max>] [Background <image>]
+# + <var> <color> [AddPrev] [Add <add>] [Mult <mult>]
+LineChart 1 10 10 100 60 North
++ localhost:network_io_stats:tx:"eth0" FF0000FF
++ localhost:network_io_stats:rx:"eth0" 00FF00FF
+
+# AreaChart <update> <x> <y> <width> <height> [North|West|East|South] [Min <min>] [Max <max>] [Background <image>]
+# + <var> <color> [ColorRange <distance> <color> ...] [Top <height> <color>] [AddPrev] [Add <add>] [Mult <mult>]
+AreaChart 1 10 10 100 60 North
++ localhost:cpu_percents:kernel FF0000FF
++ localhost:cpu_percents:user 00FF00FF AddPrev
++ localhost:cpu_percents:nice FFFF00FF AddPrev
+
+# Text <update> <x> <y> <width> <height> <color> <font> <format> [North|West|East|South] [Alignment <alignment>] [TabWidth <width>]
+# + <var> [Add <add>] [Mult <mult>]
+Text 1 10 10 100 60 FFFF00FF "Arial/12" "%f kb/s\n%f kb/s" North Alignment TopRight
++ localhost:network_io_stats:tx:"eth0" Mult 0.001
++ localhost:network_io_stats:rx:"eth0" Mult 0.001
+
+# ImageText <update> <x> <y> <width> <height> <fontfile> <format> [North|West|East|South] [Alignment <alignment>] [TabWidth <width>]
+# + <var> [Add <add>] [Mult <mult>]
+ImageText 1 10 10 100 60 "font.png" "%f kb/s\n%f kb/s" North Alignment CenterLeft
++ localhost:network_io_stats:tx:"eth0" Mult 0.001
++ localhost:network_io_stats:rx:"eth0" Mult 0.001
+
