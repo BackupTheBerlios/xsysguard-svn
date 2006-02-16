@@ -15,6 +15,8 @@
 # along with xsysguard; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+DESTDIR ?= /usr/local
+DOCDIR  := $(DESTDIR)/share/doc/xsysguard
 PERL    ?= /usr/bin/env perl
 HTMLGEN := htmlgen.pl
 VERSION := ../VERSION
@@ -50,14 +52,14 @@ clean:
 distclean: clean
 
 install: all
-	mkdir -p $(DESTDIR)/share/doc
-	mkdir -p $(DESTDIR)/share/doc/html
-	mkdir -p $(DESTDIR)/share/doc/html/widgets
-	mkdir -p $(DESTDIR)/share/doc/html/examples
-	cp $(TXT) $(DESTDIR)/share/doc/
-	cp $(HTML) $(DESTDIR)/share/doc/html/
-	cp html/widgets/*.png $(DESTDIR)/share/doc/html/widgets/
-	cp html/examples/*.png $(DESTDIR)/share/doc/html/examples/
+	mkdir -p $(DOCDIR)
+	mkdir -p $(DOCDIR)/html
+	mkdir -p $(DOCDIR)/html/widgets
+	mkdir -p $(DOCDIR)/html/examples
+	cp $(TXT) $(DOCDIR)/
+	cp $(HTML) $(DOCDIR)/html/
+	cp html/widgets/*.png $(DOCDIR)/html/widgets/
+	cp html/examples/*.png $(DOCDIR)/html/examples/
 
 .PHONY: all clean distclean install
 
