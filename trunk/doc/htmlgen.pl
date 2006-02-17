@@ -135,7 +135,7 @@ body {
 	background: #FFF;
 	color: #000;
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 90%;
+	font-size: 14px;
 }
 img {
 	border: 0px;
