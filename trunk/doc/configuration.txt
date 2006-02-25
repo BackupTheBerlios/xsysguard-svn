@@ -1,6 +1,9 @@
 # Set Tick <ms>
 Set Tick 1000
 
+# Set Class <class>
+Set Class "xsysguard_small"
+
 # Set Geometry [<width>{xX}<height>][{+-}<xoffset>{+-}<yoffset>]
 Set Geometry 200x120-60+60
 
